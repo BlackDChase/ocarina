@@ -27,10 +27,15 @@ def getData(file_n,n):
     notes = open(file_n,"r")
     for lines in notes:
         DATA.append(lines)
-    data = []
+    
     in_data = DATA[0] 
     #right now all the songs are in one line so... 
-
+    
+    F_DATA = []
+    #for in_data in DATA:
+    # when many songs seprated by lines
+    
+    data = []
     for i in range(1,len(in_data)-1):
         alph = ''
         while (in_data[i]!='\'' or in_data[i]!=' ' or in_data[i]!=',') and i>(len(in_data)-1):
@@ -38,19 +43,24 @@ def getData(file_n,n):
             i = i + 1
         data.append(alph)
     data = tokenize(data)
-    in_data = []
+    final_data = []
     for i in range(0, len(data),n):
         alph = []
         for z in range(i,i+n):
             if z>=len(data):
                 break
             alph.append(data[z])
-        in_data.append(alph)
-    if len(in_data[-2])>len(in_data[-1]):
-        del in_data[-1]
-    in_data =  pt.Tensor(in_data)
-    in_data.to(device)
-    return in_data
+        final_data.append(alph)
+    
+    if len(final_data[-2])>len(final_data[-1]):
+        del final_data[-1]
+    #F_DATA.append(final_data)
+    #for loop to be closes for many song data
+
+    F_DATA = in_data
+    F_DATA =  pt.Tensor(F_DATA)
+    F_DATA.to(device)
+    return F_DATA
 
 file_n="data/ocarina.txt"
 n=100 
