@@ -1,25 +1,28 @@
 import torch as pt
 from random import random
-import sys
+#import sys
+import re
 
 if pt.cuda.is_available():
     device = pt.device("cuda:0")
 else:
     device = pt.device("cpu")
+#GPU
 
 dic = {}
 #tokenize data dict
 
+
 def tokenize(data):
-    print("yo",data)
+    #print("yo",data)
     Data = []
     for i in data:
-        print("\n>>",i)
-        sys.exit()
+        #print("\n>>",i)
+        #sys.exit()
         if i not in dic.keys():
             x = 1
             while x in dic.values():
-                x = (float(random())*10000)%10000
+                x = int((float(random())*10000)%10000)
             dic[i] = x
         Data.append(dic[i])
     return Data
@@ -27,8 +30,6 @@ def tokenize(data):
 
 
 def getData(file_n,n):
-   # in_data = []
-
     notes = []
     #Every line will have notes of 1 midi file
 
@@ -36,19 +37,16 @@ def getData(file_n,n):
     for lines in f_notes:
         notes.append(lines)
     #print(len(notes)) 
+    
+    notefinder = re.compile(r'\'([a-zA-Z0-9\.#\-]+)\'')
     inputData = []
     for in_data in notes:
         # when many songs seprated by lines
         if len(in_data) < (n+(n//2)):
             continue
-        music = []
-        for i in range(0,len(in_data)):
-            beat = ''
-            while (in_data[i]!='\'' or in_data[i]!=' ' or in_data[i]!=',' or in_data[i]!='[' or in_data[i]!=']') and i>(len(in_data)-1):
-                beat = beat + in_data[i]
-                i = i + 1
-            music.append(beat)
-        nMusic = tokenize(music)
+        
+        nMusic = notefinder.findall(in_data)
+        nMusic = tokenize(nMusic)
         music = []
         # len(music) is number of label available for each music
         for i in range(len(nMusic) - n):
@@ -65,9 +63,9 @@ def getData(file_n,n):
             inputData.append(label)
     #for loop to be closes for many song data
     
-    print(len(inputData),len(inputData[0]),len(inputData[0][0]),inputData[0][0])
+    print(len(inputData),len(inputData[0]),len(inputData[0][0]))
     print(type(inputData),type(inputData[0]),type(inputData[0][0]))
-    print(dic)
+    #print(dic)
     #inputData =  pt.Tensor(inputData)
     #print(inputData.size(),type(inputData))
     #inputData.to(device)
