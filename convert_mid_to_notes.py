@@ -2,6 +2,8 @@ import glob
 from music21 import converter, instrument, note, chord
 
 notes = []
+
+'''
 for file in glob.glob("ocarina_midi_data/*.mid"):
     try:
         midi = converter.parse(file)
@@ -23,15 +25,16 @@ for file in glob.glob("ocarina_midi_data/*.mid"):
 print(notes)
 with open("data/ocarina.txt", "w+") as file:
     file.write(str(notes))
-
-
+#this is for a combined output
 '''
-for file in glob.glob("ocarina_midi_data/*.mid"):
+#this is for an output which is seprated by diffrent music files because every file is different
+
+for files in glob.glob("ocarina_midi_data/*.mid"):
     musicnote = []
     try:
-        midi = converter.parse(file)
+        midi = converter.parse(files)
     except:
-        print(str(file), "is bad")
+        print(str(files), "is bad")
         continue
     notes_to_parse = None
     parts = instrument.partitionByInstrument(midi)
@@ -45,11 +48,10 @@ for file in glob.glob("ocarina_midi_data/*.mid"):
             musicnote.append(str(element.pitch))
         elif isinstance(element, chord.Chord):
             musicnote.append('.'.join(str(n) for n in element.normalOrder))
-    if len(musicnote>0):
+    if len(musicnote)>0:
         notes.append(musicnote)
 print(notes)
 with open("data/ocarina.txt", "w+") as file:
-    for i in notes:
-        file.write(str(i))
-'''
-
+    for i in range(len(notes)):
+        file.write(str(notes[i]))
+        file.write("\n")
