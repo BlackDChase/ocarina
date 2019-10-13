@@ -6,6 +6,7 @@ import torch as pt
 from random import random
 import sys
 import re
+import music21
 
 if pt.cuda.is_available():
     device = pt.device("cuda:0")
@@ -113,6 +114,16 @@ class LSTMModel(nn.Module):
         # out.size() --> 100, 10
         return out
 
+def playMusic(codes):
+    notes = []
+    for audio in codes:
+        try:
+            notes.append(dic.keys()[dic.values().index(audio)])
+        except:
+            print(str(audio)," is not a keystroke")
+            continue
+    print(notes)
+    
 file_n="data/ocarina.txt"
 n=100
 #lenght of set of data
@@ -127,7 +138,7 @@ train_loader = pt.utils.data.DataLoader(dataset=Data, batch_size=batch, shuffle=
 input_dim = 100     #why??
 hidden_dim = 100    #why??
 layer_dim = 1       #why??
-output_dim = 286    #the number of notes found through dict
+output_dim = 1    #the number of notes found through dict = 286, but we are asked to have only 1, to forward it
 
 model = LSTMModel(input_dim, hidden_dim, layer_dim, output_dim)
 criterion = nn.CrossEntropyLoss()
@@ -140,7 +151,22 @@ for i in range(len(list(model.parameters()))):
 # Number of steps to unroll
 '''
 seq_dim = 51        #why?? he used 28 , input dim he chose 28.. so i am choosing acordingly
+codes = []
+for i, (notes, labels) in enumerate(train_loader):
 
+    notes = notes.view(-1, seq_dim, input_dim).requires_grad_()
+    optimizer.zero_grad()
+    outputs = model(notes)
+    codes.append(output)
+    loss = criterion(outputs, labels)
+    loss.backward()
+    optimizer.step()
+    break
+print(codes)
+playMusic(codes)
+
+'''
+# This is where the model is trained
 iter = 0
 for epoch in range(num_epochs):
     for i, (notes, labels) in enumerate(train_loader):
@@ -190,3 +216,4 @@ for epoch in range(num_epochs):
 
             # Print Loss
             print('Iteration: {}. Loss: {}. Accuracy: {}'.format(iter, loss.item(), accuracy))
+'''
