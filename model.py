@@ -123,7 +123,9 @@ def playMusic(codes):
             print(str(audio)," is not a keystroke")
             continue
     print(notes)
-    
+
+
+
 file_n="data/ocarina.txt"
 n=100
 #lenght of set of data
