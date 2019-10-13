@@ -124,7 +124,9 @@ def playMusic(codes):
             print(str(audio)," is not a keystroke")
             continue
     print(notes)
-    
+
+
+
 file_n="data/ocarina.txt"
 n=100
 #lenght of set of data
@@ -139,7 +141,7 @@ train_loader = pt.utils.data.DataLoader(dataset=Data, batch_size=batch, shuffle=
 input_dim = 100     #why??
 hidden_dim = 100    #why??
 layer_dim = 1       #why??
-output_dim = 1    #the number of notes found through dict = 106, but we are asked to have only 1, to forward it
+output_dim = 1    #the number of notes found through dict = 286, but we are asked to have only 1, to forward it
 
 model = LSTMModel(input_dim, hidden_dim, layer_dim, output_dim)
 criterion = nn.CrossEntropyLoss()
