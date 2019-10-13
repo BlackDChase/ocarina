@@ -63,12 +63,12 @@ def getData(file_n,n):
             inputData.append(label)
     #for loop to be closes for many song data
     
-    print(len(inputData),len(inputData[0]),len(inputData[0][0]))
-    print(type(inputData),type(inputData[0]),type(inputData[0][0]))
+    #print(len(inputData),len(inputData[0]),len(inputData[0][0]))
+    #print(type(inputData),type(inputData[0]),type(inputData[0][0]))
     #print(dic)
-    #inputData =  pt.Tensor(inputData)
-    #print(inputData.size(),type(inputData))
-    #inputData.to(device)
+    inputData =  pt.Tensor(inputData)
+    print(inputData.size(),type(inputData))
+    inputData.to(device)
     return inputData
 
 file_n="data/ocarina.txt"
