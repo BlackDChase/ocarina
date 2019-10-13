@@ -43,7 +43,7 @@ def getData(file_n,n):
         notes.append(lines)
     #print(len(notes)) 
     
-    notefinder = re.compile(r'\'([a-zA-Z0-9\.#\-]+)\'')
+    notefinder = re.compile(r'\'([a-zA-Z0-9#\-]+)|>(\d+)\'')
     inputData = []
     for in_data in notes:
         # when many songs seprated by lines
@@ -71,8 +71,9 @@ def getData(file_n,n):
     #print(len(inputData),len(inputData[0]),len(inputData[0][0]))
     #print(type(inputData),type(inputData[0]),type(inputData[0][0]))
     #print(len(dic))
+    print(inputData[0][0])
     inputData =  pt.Tensor(inputData)
-    #print(inputData.size(),type(inputData))
+    print(inputData.size(),type(inputData))
     #sys.exit()
     inputData.to(device)
     return inputData
@@ -138,7 +139,7 @@ train_loader = pt.utils.data.DataLoader(dataset=Data, batch_size=batch, shuffle=
 input_dim = 100     #why??
 hidden_dim = 100    #why??
 layer_dim = 1       #why??
-output_dim = 1    #the number of notes found through dict = 286, but we are asked to have only 1, to forward it
+output_dim = 1    #the number of notes found through dict = 106, but we are asked to have only 1, to forward it
 
 model = LSTMModel(input_dim, hidden_dim, layer_dim, output_dim)
 criterion = nn.CrossEntropyLoss()

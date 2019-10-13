@@ -47,7 +47,8 @@ for files in glob.glob("ocarina_midi_data/*.mid"):
         if isinstance(element, note.Note):
             musicnote.append(str(element.pitch))
         elif isinstance(element, chord.Chord):
-            musicnote.append('.'.join(str(n) for n in element.normalOrder))
+            for cord in element.normalOrder:
+                musicnote.append('>' + (str(cord)))
     if len(musicnote)>0:
         notes.append(musicnote)
 print(notes)
