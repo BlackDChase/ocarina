@@ -1,5 +1,6 @@
 import torch.nn as nn
 import torch as pt
+import convert_mid_to_notes
 #import torchvision.transform as transforms
 #import torchvision.datasets as dsets
 
@@ -10,6 +11,7 @@ import music21
 
 if pt.cuda.is_available():
     device = pt.device("cuda:0")
+    print("Running on CUDA")
 else:
     device = pt.device("cpu")
 #GPU
@@ -80,6 +82,7 @@ def getData(file_n,n):
     #sys.exit()
     inputData.to(device)
     return inputData
+
 '''
 class LSTMModel(nn.Module):
     #Source : https://www.deeplearningwizard.com/deep_learning/practical_pytorch/pytorch_lstm_neuralnetwork/
@@ -118,6 +121,7 @@ class LSTMModel(nn.Module):
         # out.size() --> 100, 10
         return out
 '''
+
 def playMusic(codes):
     notes = []
     for audio in codes:
@@ -135,8 +139,15 @@ n=100
 #lenght of set of data
 Data = getData(file_n,n)
 
-### end
+### OR
+'''
+file_n = convert_mid_to_notes.dataLoader()
+n=100
+Data = getData(file_n,n)
+'''
 
+print(dic)
+sys.exit()
 
 batch = 5           #why??
 n_iters = 1000      #why??
