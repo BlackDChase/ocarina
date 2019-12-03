@@ -14,6 +14,9 @@ else:
     device = pt.device("cpu")
 #GPU
 
+
+### start
+
 dic = {}
 #tokenize data dict
 
@@ -77,7 +80,7 @@ def getData(file_n,n):
     #sys.exit()
     inputData.to(device)
     return inputData
-
+'''
 class LSTMModel(nn.Module):
     #Source : https://www.deeplearningwizard.com/deep_learning/practical_pytorch/pytorch_lstm_neuralnetwork/
     def __init__(self, input_dim, hidden_dim, layer_dim, output_dim):
@@ -114,7 +117,7 @@ class LSTMModel(nn.Module):
         out = self.fc(out[:, -1, :]) 
         # out.size() --> 100, 10
         return out
-
+'''
 def playMusic(codes):
     notes = []
     for audio in codes:
@@ -131,6 +134,9 @@ file_n="data/ocarina.txt"
 n=100
 #lenght of set of data
 Data = getData(file_n,n)
+
+### end
+
 
 batch = 5           #why??
 n_iters = 1000      #why??
@@ -169,6 +175,7 @@ print(codes)
 playMusic(codes)
 
 '''
+### The orignal implimentation of LSTM
 # This is where the model is trained
 iter = 0
 for epoch in range(num_epochs):
