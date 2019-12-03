@@ -1,4 +1,5 @@
 import glob
+import os
 from music21 import converter, instrument, note, chord
 
 notes = []
@@ -51,6 +52,10 @@ for files in glob.glob("ocarina_midi_data/*.mid"):
     if len(musicnote)>0:
         notes.append(musicnote)
 print(notes)
+
+os.remove("data/ocarina.txt")
+#need a check in this
+
 with open("data/ocarina.txt", "w+") as file:
     for i in range(len(notes)):
         file.write(str(notes[i]))
