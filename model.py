@@ -1,6 +1,9 @@
 import torch.nn as nn
 import torch as pt
-import convert_mid_to_notes
+import convert
+import numpy as np
+from random import randint
+
 #import torchvision.transform as transforms
 #import torchvision.datasets as dsets
 
@@ -18,70 +21,22 @@ else:
 
 
 ### start
-
 dic = {}
-#tokenize data dict
 
-
-def tokenize(data):
-    #print("yo",data)
-    Data = []
-    for i in data:
-        #print("\n>>",i)
-        #sys.exit()
-        if i not in dic.keys():
-            x = 1
-            while x in dic.values():
-                x = int((float(random())*10000)%10000)
-            dic[i] = x
-        Data.append(dic[i])
-    return Data
-#Using random Function to make data more distinct
-
-
-def getData(file_n,n):
-    notes = []
-    #Every line will have notes of 1 midi file
-
-    f_notes = open(file_n,"r")
-    for lines in f_notes:
-        notes.append(lines)
-    #print(len(notes)) 
+#def getData(notes,n):
     
-    notefinder = re.compile(r'\'([a-zA-Z0-9#\-]+)|>(\d+)\'')
-    inputData = []
-    for in_data in notes:
-        # when many songs seprated by lines
-        if len(in_data) < (n+(n//2)):
-            continue
-        
-        nMusic = notefinder.findall(in_data)
-        nMusic = tokenize(nMusic)
-        music = []
-        # len(music) is number of label available for each music
-        for i in range(len(nMusic) - n):
-            workset = []
-            for j in range(i,i+n):
-                workset.append(nMusic[j])
-            music.append(workset)
-        for i in range(0,(len(music)//(n//2)),(n//2) ):
-            label = []
-            if (i + n//2)>len(music):
-                continue
-            for k in range(i,i+(n//2)):
-                label.append(music[k])
-            inputData.append(label)
-    #for loop to be closes for many song data
-    
-    #print(len(inputData),len(inputData[0]),len(inputData[0][0]))
-    #print(type(inputData),type(inputData[0]),type(inputData[0][0]))
-    #print(len(dic))
-    print(inputData[0][0])
-    inputData =  pt.Tensor(inputData)
-    print(inputData.size(),type(inputData))
-    #sys.exit()
-    inputData.to(device)
-    return inputData
+
+
+
+
+
+
+
+
+
+
+
+
 
 '''
 class LSTMModel(nn.Module):
@@ -108,7 +63,7 @@ class LSTMModel(nn.Module):
 
         # Initialize cell state
         c0 = torch.zeros(self.layer_dim, x.size(0), self.hidden_dim).requires_grad_()
-
+        
         # 28 time steps
         # We need to detach as we are doing truncated backpropagation through time (BPTT)
         # If we don't, we'll backprop all the way to the start even after going through another batch
@@ -122,32 +77,67 @@ class LSTMModel(nn.Module):
         return out
 '''
 
-def playMusic(codes):
-    notes = []
-    for audio in codes:
-        try:
-            notes.append(dic.keys()[dic.values().index(audio)])
-        except:
-            print(str(audio)," is not a keystroke")
+def make_dictonary(keys,dic):
+    for i in range(len(keys)):
+        temp = []
+        for z in range(len(keys)):
+            if(z==i):
+                temp.append(1)
+            else:
+                temp.append(0)
+        dic[str(keys[i])] = temp
+
+def transform(unorganised_data):
+    data = []
+    it = -1
+    for music_file in unorganised_data:
+        diced_data = []
+        randomized_data = []
+        check_list = []
+        it +=1
+        if len(music_file)<199:
+            #to be able to have atleast 100 sets of 100 notes
+            print("File too small : ",it)
             continue
-    print(notes)
+        print("Tokenising file no : ",it)
+        tokenized_notes = []
+        for notes in music_file:
+            tokenized_notes.append(dic[str(notes)])
+        for i in range(len(music_file)-99):
+            #for making sets of 100 notes
+            noteSet = []
+            for j in range(i,i+100):
+                noteSet.append(tokenized_notes[j])
+            diced_data.append(noteSet)
+        for i in range(100):
+            random_number = randint(0,len(diced_data)-1)
+            while(random_number in check_list):
+                random_number = randint(0,len(diced_data)-1)                
+            check_list.append(random_number)
+            randomized_data.append(diced_data[random_number])
+        data.append(randomized_data)
+    print("Convertion into Tensor")    
+    data = pt.Tensor(data)
+    print("Transferring to device")
+    data.to(device)
+    return data
 
 
+n_files_to_load = 10
+keys = []
+data, keys = convert.parse_to_notes(n_files_to_load)
+#if no argument passed, it will do it for all values
 
-file_n="data/ocarina.txt"
-n=100
-#lenght of set of data
-Data = getData(file_n,n)
+make_dictonary(keys,dic)
+data = transform(data)
 
-### OR
-'''
-file_n = convert_mid_to_notes.dataLoader()
-n=100
-Data = getData(file_n,n)
-'''
-
-print(dic)
+print("Tensor Shape : ",data.shape)
 sys.exit()
+
+
+
+
+
 
 batch = 5           #why??
 n_iters = 1000      #why??
