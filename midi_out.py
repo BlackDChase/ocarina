@@ -15,14 +15,12 @@ def refurbished(data,dic):
 
 def make_music(data):
     if(type(data[0])!=list):
-        
+        #code
         return
     for lists in data:
         make_music(lists)
 
 def prep_files(data,dic):
-    print("converting tokens back to notes and chords")
-    data=data.tolist()
     refurbished_data = refurbished(data,dic)
     print("Making Music")
     make_music(refurbished_data)
