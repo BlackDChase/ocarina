@@ -60,12 +60,9 @@ def transform(n_files_to_load,dic):
     data = []
     it = -1
     for music_file in unorganised_data:
-        diced_data = []
-        randomized_data = []
-        check_list = []
         it +=1
-        if len(music_file)<199:
-            #to be able to have atleast 100 sets of 100 notes
+        if len(music_file)<99:
+            #to be able to have atleast 100 sets notes
             print("File too small : ",it)
             continue
         print("Tokenising file no : ",it)
@@ -77,12 +74,5 @@ def transform(n_files_to_load,dic):
             noteSet = []
             for j in range(i,i+100):
                 noteSet.append(tokenized_notes[j])
-            diced_data.append(noteSet)
-        for i in range(100):
-            random_number = randint(0,len(diced_data)-1)
-            while(random_number in check_list):
-                random_number = randint(0,len(diced_data)-1)                
-            check_list.append(random_number)
-            randomized_data.append(diced_data[random_number])
-        data.append(randomized_data)
+            data.append(noteSet)
     return dic, data
