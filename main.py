@@ -4,7 +4,7 @@ import model
 import sys
 
 dic = {}
-n_files_to_load = 10   
+n_files_to_load = 10 
 
 # to load all the files
 # n_files_to_load = 0     
@@ -14,6 +14,11 @@ dic,data = midi_in.transform(n_files_to_load,dic)
 
 print("Running model")
 data = model.creator(data,len(dic))
+# Training part incomplete, random99 has to be edited
 
 print("Conveting the files back to midi")
-midi_out.prep_files(data,dic)
+music = midi_out.prep_files(data,dic)
+# Make music function incomplete
+
+print("Playing Music")
+# Player not made
