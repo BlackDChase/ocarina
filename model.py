@@ -28,7 +28,8 @@ def creator(data,n_keys):
     layer_dim = 1                       # why?
     hidden_dim = 100
     model = LSTMModel(input_dim,hidden_dim,layer_dim,output_dim)
-
+    model.to(device)
+    
     ### Instantiate loss class
     criterion = nn.CrossEntropyLoss()
 
@@ -95,11 +96,13 @@ def train(model,criterion,optimizer,data,n_keys):
             datapoint.requires_grad_()
             #print(datapoint.shape)
             datapoint = datapoint.view(-1,99,n_keys)
+            datapoint = datapoint.to(device)
             #label = label.view(-1,n_keys)
             index_label = index_finder(label)
             index_label = torch.Tensor([index_label])
             index_label = index_label.type(torch.LongTensor)
-            
+            index_label = index_label.to(device)
+
             # Clean optimizer
             optimizer.zero_grad()
             
@@ -135,7 +138,7 @@ def generate(model,n_keys):
                 temp.append(0)
         random_nintynine.append(temp)
     random_nintynine = torch.Tensor(random_nintynine)
-    #random_nintynine.to(device)
+    random_nintynine.to(device)
     for i in range(901):
         model_input = random_nintynine[i:]
         #print(model_input.shape)
