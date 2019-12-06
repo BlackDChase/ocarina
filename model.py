@@ -1,26 +1,28 @@
 import torch.nn as nn
-import torch as pt
-import numpy as np
-
+import torch
+from random import randint
+import sys
 #import torchvision.transform as transforms
 #import torchvision.datasets as dsets
 
 ### GPU
-if pt.cuda.is_available():
-    device = pt.device("cuda:0")
+
+if torch.cuda.is_available():
+    device = torch.device("cuda:0")
     print("Running on CUDA")
 else:
-    device = pt.device("cpu")
+    device = torch.device("cpu")
 
 
 def creator(data,n_keys):
     print("Converting to tensor tensor")
-    data = pt.Tensor(data)
+    data = torch.Tensor(data)
     print("Tensor Shape : ",data.shape)
     print("Moving files to device")
     data.to(device)
     
     ### Instantiate the model
+    print("Instantiating Model")
     output_dim = n_keys
     input_dim = n_keys
     layer_dim = 1                       # why?
@@ -32,15 +34,16 @@ def creator(data,n_keys):
 
     ### Instantiate Optimizer Class
     learning_rate = 0.1
-    optimizer = pt.optim.SGD(model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
     
     ### Instantiate Training
-    train(model,criterion,optimizer,data)
+    print("Training model")
+    train(model,criterion,optimizer,data,n_keys)
     
     ### Generating the new Data
+    print("Generating data")
     new_data = generate(model,n_keys)
-    new_data.tolist
-    return new_data
+    return new_data.tolist()
 
 
 class LSTMModel(nn.Module):
@@ -81,9 +84,39 @@ class LSTMModel(nn.Module):
         return out
 
 ### Train the model
-def train(model,criterion,optimizer,data):
-    #code
-    
+def train(model,criterion,optimizer,data,n_keys):
+    epochs = 500
+    for epoch in range(epochs):
+        # Iterate over dataset
+        for datapoint in data:
+            # Prepare data points
+            label = datapoint[-1]
+            datapoint = datapoint[:-1]
+            datapoint.requires_grad_()
+            #print(datapoint.shape)
+            datapoint = datapoint.view(-1,99,n_keys)
+            #label = label.view(-1,n_keys)
+            index_label = index_finder(label)
+            index_label = torch.Tensor([index_label])
+            index_label = index_label.type(torch.LongTensor)
+            
+            # Clean optimizer
+            optimizer.zero_grad()
+            
+            # Get output from model
+            output = model(datapoint)
+            #output = output.squeeze()
+
+            # Calculate loss
+            #print(output.shape,index_label)
+            loss = criterion(output,index_label)
+
+            # Calculate gradient
+            loss.backward()
+
+            # Update Gradient
+            optimizer.step()
+        print("Epoch : ",epoch," Done")
     return
 
 ### Generate a raw data
@@ -93,6 +126,7 @@ def generate(model,n_keys):
 
     for i in range(99):
         pos = randint(0,n_keys-1)
+        #print(pos)
         temp = []
         for j in range(n_keys):
             if j==pos:
@@ -100,12 +134,43 @@ def generate(model,n_keys):
             else:
                 temp.append(0)
         random_nintynine.append(temp)
-    random_nintynine = pt.Tensor(random_nintynine)
+    random_nintynine = torch.Tensor(random_nintynine)
     #random_nintynine.to(device)
     for i in range(901):
-        generated_one = model(random_nintynine[i,i+99])
-        random_nintynine = pt.cat((generated_one.unsqueeze(dim=0),random_nintynine),dim=0)
+        model_input = random_nintynine[i:]
+        #print(model_input.shape)
+        model_input = model_input.view(-1,99,n_keys)
+        model_input = model_input.to(device)
+        #print(model_input.shape)
+        generated_one = model(model_input)
+        generated_one = clean_output(generated_one)
+        #print(generated_one.shape,random_nintynine.shape)
+        random_nintynine = torch.cat((random_nintynine,generated_one),dim=0)
         #adding the newly generated tokenized note to the tokenized music set
     return random_nintynine
 
-### Wrapper function
+### Output cleaner
+# It cleans the output to give the desired dic value
+def clean_output(output):
+    maxF = 0
+    output = output[0].tolist()
+    for i in range(len(output)):
+        if output[i]>output[maxF]:
+            maxF=i
+    new_output = []
+    for i in range(len(output)):
+        if i == maxF:
+            new_output.append(1)
+        else:
+            new_output.append(0)
+    return torch.Tensor(new_output).unsqueeze(dim=0)
+
+def index_finder(label):
+    maxF = 0
+    label = label.tolist()
+    if len(label)==1:
+        label = label[0]
+    for i in range(len(label)):
+        if label[i]>label[maxF]:
+            maxF = i
+    return maxF
