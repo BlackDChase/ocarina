@@ -35,11 +35,12 @@ def creator(data,n_keys):
     optimizer = pt.optim.SGD(model.parameters(), lr=learning_rate)
     
     ### Instantiate Training
-    new_data = train(model,criterion,optimizer,data)
-
-    print("Converting tensor to list")
-    new_data.tolist()
-    return new_data           
+    train(model,criterion,optimizer,data)
+    
+    ### Generating the new Data
+    new_data = generate(model,n_keys)
+    new_data.tolist
+    return new_data
 
 
 class LSTMModel(nn.Module):
@@ -79,9 +80,32 @@ class LSTMModel(nn.Module):
         # out.size() --> 100, 10
         return out
 
-
 ### Train the model
 def train(model,criterion,optimizer,data):
     #code
-    return data
+    
+    return
+
+### Generate a raw data
+def generate(model,n_keys):
+    random_nintynine = []
+    # The first 99 which are randomly made, and on basiis of model it will genrate new ones
+
+    for i in range(99):
+        pos = randint(0,n_keys-1)
+        temp = []
+        for j in range(n_keys):
+            if j==pos:
+                temp.append(1)
+            else:
+                temp.append(0)
+        random_nintynine.append(temp)
+    random_nintynine = pt.Tensor(random_nintynine)
+    #random_nintynine.to(device)
+    for i in range(901):
+        generated_one = model(random_nintynine[i,i+99])
+        random_nintynine = pt.cat((generated_one.unsqueeze(dim=0),random_nintynine),dim=0)
+        #adding the newly generated tokenized note to the tokenized music set
+    return random_nintynine
+
 ### Wrapper function
