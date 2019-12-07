@@ -13,11 +13,12 @@ def make_dictonary(keys,dic):
                 temp.append(1)
             else:
                 temp.append(0)
-        dic[str(keys[i])] = temp
+        dic[keys[i]] = temp
     return dic
 
 def parse_to_notes(iteration):
     NoteList = []
+    NoteList.append(note.Rest)
     notes = []
     #this is for an output which is seprated by diffrent music files because every file is different
     for files in glob.glob("ocarina_midi_input_data/*.mid"):
@@ -39,19 +40,21 @@ def parse_to_notes(iteration):
             notes_to_parse = midi.flat.notes
         for element in notes_to_parse:
             if isinstance(element, note.Note):
-                musicnote.append(str(element.pitch))
+                musicnote.append(element.pitch)
                 if element.pitch not in NoteList:
                     NoteList.append(element.pitch)
             elif isinstance(element, chord.Chord):
                 for cord in element.normalOrder:
-                    musicnote.append(str(cord))
+                    musicnote.append(cord)
                     if cord not in NoteList:
                         NoteList.append(cord)
+            elif isinstance(element, note.Rest):
+                musicnote.append(note.Rest)
         if len(musicnote)>0:
             notes.append(musicnote)
         if iteration == 0:
             break
-    return notes, NoteList;
+    return notes,NoteList
 
 def transform(n_files_to_load,dic):
     keys = []
@@ -68,11 +71,21 @@ def transform(n_files_to_load,dic):
         print("Tokenising file no : ",it)
         tokenized_notes = []
         for notes in music_file:
-            tokenized_notes.append(dic[str(notes)])
+            tokenized_notes.append(dic[notes])
         for i in range(len(music_file)-99):
             #for making sets of 100 notes
             noteSet = []
             for j in range(i,i+100):
                 noteSet.append(tokenized_notes[j])
             data.append(noteSet)
-    return dic, data
+    return data,dic
+
+def transform_test(dic):
+    keys = []
+    unorganised_data, keys = parse_to_notes(1)
+    dic = make_dictonary(keys,dic)
+    print("Tokenising")
+    tokenized_notes = []
+    for notes in unorganised_data[0]:
+        tokenized_notes.append(dic[notes])
+    return tokenized_notes,dic

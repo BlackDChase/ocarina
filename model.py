@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch
 from random import randint
+from tqdm import tqdm
 import sys
 #import torchvision.transform as transforms
 #import torchvision.datasets as dsets
@@ -87,7 +88,7 @@ class LSTMModel(nn.Module):
 ### Train the model
 def train(model,criterion,optimizer,data,n_keys):
     epochs = 500
-    for epoch in range(epochs):
+    for epoch in tqdm(range(epochs)):
         # Iterate over dataset
         for datapoint in data:
             # Prepare data points
@@ -139,7 +140,7 @@ def generate(model,n_keys):
         random_nintynine.append(temp)
     random_nintynine = torch.Tensor(random_nintynine)
     random_nintynine.to(device)
-    for i in range(901):
+    for i in tqdm(range(901)):
         model_input = random_nintynine[i:]
         #print(model_input.shape)
         model_input = model_input.view(-1,99,n_keys)
