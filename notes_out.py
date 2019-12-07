@@ -2,8 +2,8 @@ from music21 import converter, instrument, note, chord
 
 def note_finder(data,dic):
     for key in dic.keys():
-        if dic[key]==data:
-            return key
+        if dic[key][0]==data:
+            return dic[key][1]
     return None
 
 def make_notes(data,dic):

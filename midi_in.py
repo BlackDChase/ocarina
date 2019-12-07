@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch as pt
 import numpy as np
 from random import randint
+from copy import deepcopy
 
 def make_dictonary(keys,dic):
     for i in range(len(keys)):
@@ -13,12 +14,11 @@ def make_dictonary(keys,dic):
                 temp.append(1)
             else:
                 temp.append(0)
-        dic[keys[i]] = temp
+        dic[str(keys[i])] = (temp,keys[i])
     return dic
 
 def parse_to_notes(iteration):
     NoteList = []
-    NoteList.append(note.Rest)
     notes = []
     #this is for an output which is seprated by diffrent music files because every file is different
     for files in glob.glob("ocarina_midi_input_data/*.mid"):
@@ -30,26 +30,13 @@ def parse_to_notes(iteration):
             print("Bad file : ",str(files))
             continue
         print("Parsing : ",str(files))
-        notes_to_parse = None
-        parts = instrument.partitionByInstrument(midi)
-        if parts:  
-            # file has instrument parts
-            notes_to_parse = parts.parts[0].recurse()
-        else:
-            # file has notes in a flat structure
-            notes_to_parse = midi.flat.notes
-        for element in notes_to_parse:
-            if isinstance(element, note.Note):
-                musicnote.append(element.pitch)
-                if element.pitch not in NoteList:
-                    NoteList.append(element.pitch)
-            elif isinstance(element, chord.Chord):
-                for cord in element.normalOrder:
-                    musicnote.append(cord)
-                    if cord not in NoteList:
-                        NoteList.append(cord)
-            elif isinstance(element, note.Rest):
-                musicnote.append(note.Rest)
+
+        for element in midi.recurse():
+            note = deepcopy(element)
+            musicnote.append(note)
+            if note not in NoteList:
+                NoteList.append(note)
+                
         if len(musicnote)>0:
             notes.append(musicnote)
         if iteration == 0:
@@ -59,6 +46,7 @@ def parse_to_notes(iteration):
 def transform(n_files_to_load,dic):
     keys = []
     unorganised_data, keys = parse_to_notes(n_files_to_load)
+    print("Files loaded, making referance dictonary")
     dic = make_dictonary(keys,dic)
     data = []
     it = -1
@@ -66,12 +54,12 @@ def transform(n_files_to_load,dic):
         it +=1
         if len(music_file)<99:
             #to be able to have atleast 100 sets notes
-            print("File too small : ",it)
+            print("\tFile too small : ",it)
             continue
         print("Tokenising file no : ",it)
         tokenized_notes = []
         for notes in music_file:
-            tokenized_notes.append(dic[notes])
+            tokenized_notes.append(dic[str(keys[keys.index(notes)])][0])
         for i in range(len(music_file)-99):
             #for making sets of 100 notes
             noteSet = []
@@ -84,8 +72,13 @@ def transform_test(dic):
     keys = []
     unorganised_data, keys = parse_to_notes(1)
     dic = make_dictonary(keys,dic)
-    print("Tokenising")
+    
+    #for key in dic.keys():
+    #    print(key,dic[key])
+    
+    print("Referrance dictionary made")
     tokenized_notes = []
-    for notes in unorganised_data[0]:
-        tokenized_notes.append(dic[notes])
+    unorganised_data = unorganised_data[0]
+    for notes in unorganised_data:
+        tokenized_notes.append(dic[str(keys[keys.index(notes)])][0])
     return tokenized_notes,dic

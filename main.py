@@ -8,11 +8,11 @@ dic = {}
 
 ### trial
 data,dic = midi_in.transform_test(dic)
-print(np.shape(data))
+#print(np.shape(data))
 data = notes_out.prep_files(data,dic)
-print(np.shape(data))
+#print(np.shape(data))
 player.make(data)
-print(np.shape(data))
+#print(np.shape(data))
 sys.exit()      
 
 ### Actual
